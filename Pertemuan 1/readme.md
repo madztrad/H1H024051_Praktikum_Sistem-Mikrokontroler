@@ -11,21 +11,97 @@ Shift Akhir : B
 3. Apa fungsi dari perintah delay(timeDelay)?
    delay(timeDelay) berfungsi untuk menghentikan eksekusi program selama timeDelay milidetik. Digunakan dua kali dalam satu siklus: pertama saat LED menyala, kedua saat LED mati — sehingga lamanya LED ON dan OFF sama persis, dan bersama-sama menentukan kecepatan kedip.
 4. Jika program yang dibuat memiliki alur mati → lambat → cepat → reset (mati), ubah menjadi LED tidak langsung reset → tetapi berubah dari cepat → sedang → mati dan berikan penjelasan disetiap baris kode nya dalam bentuk README.md!
+```cpp
+const int ledPin = 6;      // LED ada di pin 6 pada Arduino
+int timeDelay = 1000;      // jeda 1 detik
 
-   <img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/dcb13c83-5e3b-4e41-b611-41a7ce172404" />
+void setup() {
+  pinMode(ledPin, OUTPUT); // Mengatur pin LED sebagai output
+}
+
+void loop() {
+  // Nyalakan LED
+  digitalWrite(ledPin, HIGH);
+  delay(timeDelay);        // LED menyala sesuai waktu delay
+
+  // Matikan LED
+  digitalWrite(ledPin, LOW);
+  delay(timeDelay);        // LED mati sesuai waktu delay
+
+  // Logika perubahan kecepatan
+  if (timeDelay <= 100) {
+    timeDelay = 500;       // ubah ke kecepatan sedang
+  } 
+  else if (timeDelay == 500) {
+    digitalWrite(ledPin, LOW); // pastikan LED mati
+    delay(3000);               // jeda 3 detik (mati)
+    timeDelay = 1000;          // kembali ke awal (lambat)
+  } 
+  else {
+    timeDelay = 100;           // kurangi delay (lebih cepat)
+  }/
+```
+
 
 1.6 Pertanyaan Praktikum
 1. Schematic 5 LED Running
    
-   <img width="413" height="529" alt="image" src="https://github.com/user-attachments/assets/ee0820a2-2642-4945-877f-19b1ff5a8cae" />
+  
    
+   <img width="413" height="529" alt="Screenshot 2026-04-07 220630" src="https://github.com/user-attachments/assets/aa061da3-8048-4ee2-a731-41e0cd5bdab6" />
+
 2. Bagaimana program membuat efek LED berjalan kiri ke kanan?
    Loop for pertama menjalankan ledPin dari 2 naik ke 7 (ledPin++). Setiap iterasi menyalakan satu pin dengan digitalWrite(ledPin, HIGH), menunggu timer ms, lalu mematikannya. Karena hanya satu LED menyala pada satu waktu dan urutannya naik, efek visualnya adalah cahaya berjalan dari kiri (pin 2) ke kanan (pin 7).
 3. Bagaimana program membuat LED kembali dari kanan ke kiri?
    Loop for kedua menjalankan ledPin dari 7 turun ke 2 (ledPin--). Dengan urutan terbalik, LED yang menyala berpindah dari pin 7 kembali ke pin 2 — sehingga efeknya adalah LED berjalan dari kanan ke kiri, menciptakan gerakan bolak-balik seperti efek Knight Rider.
 4. Buatkan program agar LED menyala tiga LED kanan dan tiga LED kiri secara bergantian dan berikan penjelasan disetiap baris kode nya dalam bentuk README.md!
+```cpp
+// Variabel untuk mengatur kecepatan kedip (dalam milidetik)
+// Semakin besar nilainya, semakin lambat pergantian LED
+int timer = 500;
 
-   <img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/2fe11f7c-388a-4ceb-a08f-63b263faca55" />
+void setup() {
+  // Gunakan loop for untuk menginisialisasi semua pin 2 sampai 7 sebagai OUTPUT
+  // OUTPUT berarti Arduino akan mengirim tegangan (menyalakan/mematikan LED)
+  for (int ledPin = 2; ledPin <= 7; ledPin++) {
+    pinMode(ledPin, OUTPUT);
+  }
+}
+
+void loop() {
+  // ===== FASE 1: Nyalakan LED KIRI (pin 2, 3, 4) =====
+
+  // Loop untuk menyalakan tiga LED di sisi kiri (pin 2 sampai 4)
+  for (int ledPin = 2; ledPin <= 4; ledPin++) {
+    // Kirim sinyal HIGH (5V) ke pin -> LED menyala
+    digitalWrite(ledPin, HIGH);
+  }
+
+  // Pastikan LED kanan (pin 5, 6, 7) dalam kondisi mati
+  // agar tidak ada tumpang tindih saat fase pergantian
+  for (int ledPin = 5; ledPin <= 7; ledPin++) {
+    digitalWrite(ledPin, LOW);
+  }
+
+  delay(timer);
+
+  // ===== FASE 2: Nyalakan LED KANAN (pin 5, 6, 7) =====
+
+  // Loop untuk menyalakan tiga LED di sisi kanan (pin 5 sampai 7)
+  for (int ledPin = 5; ledPin <= 7; ledPin++) {
+    // Kirim sinyal HIGH (5V) ke pin -> LED menyala
+    digitalWrite(ledPin, HIGH);
+  }
+
+  // Matikan LED kiri (pin 2, 3, 4) agar tidak menyala bersamaan
+  for (int ledPin = 2; ledPin <= 4; ledPin++) {
+    // Kirim sinyal LOW (0V) ke pin -> LED mati
+    digitalWrite(ledPin, LOW);
+  }
+
+  delay(timer);
+}
+```
 
 1.7 Pertanyaan Analisis
 1. Uraian Hasil Setiap Percobaan
