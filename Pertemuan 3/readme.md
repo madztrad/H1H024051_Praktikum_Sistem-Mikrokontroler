@@ -51,3 +51,61 @@ void loop() {
 > Program ini menggunakan delay() karena lebih sederhana untuk membuat efek kedip. Namun, delay() bersifat blocking sehingga Arduino tidak dapat melakukan proses lain selama delay berlangsung. Jika menggunakan millis(), program menjadi non-blocking sehingga bisa multitasking.
 ## Percobaan 3B: I2C
 ### 1. Jelaskan bagaimana cara kerja komunikasi I2C antara Arduino dan LCD!
+> I2C menggunakan dua kabel (SDA untuk data, SCL untuk detak jam). Arduino bertindak sebagai Master yang mengirimkan alamat unik (0x27) untuk memanggil LCD (Slave). Setelah terhubung, Master mengirimkan data instruksi atau karakter secara berurutan lewat jalur SDA yang disinkronkan oleh pulsa SCL.
+### 2. Apakah pin potensiometer harus seperti itu? Jelaskan yang terjadi apabila pin kiri dan
+pin kanan tertukar
+> Ya, karena data dari potensiometer adalah tegangan kontinu (0-5V) yang perlu diubah menjadi angka digital (0-1023) melalui ADC Arduino. Jika Pin Kiri & Kanan Tertukar, arah putaran akan terbalik. Jika sebelumnya diputar ke kanan nilai bertambah besar, setelah tertukar, diputar ke kanan justru nilai akan mengecil menuju nol
+## 3. Modifikasi program (gabungan UART + I2C output)
+```cpp
+#include <Wire.h>                // Library komunikasi I2C
+#include <LiquidCrystal_I2C.h>   // Library LCD I2C
+#include <Arduino.h>             // Library utama Arduino
+
+LiquidCrystal_I2C lcd(0x27, 16, 2); // Inisialisasi LCD (alamat 0x27, 16x2)
+
+const int pinPot = A0;           // Pin analog untuk potensiometer
+
+void setup() {
+  Serial.begin(9600);           // Memulai komunikasi serial
+  lcd.init();                   // Inisialisasi LCD
+  lcd.backlight();              // Mengaktifkan lampu latar LCD
+}
+
+void loop() {
+  int nilai = analogRead(pinPot); // Membaca nilai analog (0-1023)
+
+  float volt = nilai * (5.0 / 1023.0); // Konversi ke tegangan (Volt)
+  int persen = map(nilai, 0, 1023, 0, 100); // Konversi ke persen (0-100%)
+
+  // Menampilkan data ke Serial Monitor (UART)
+  Serial.print("ADC: ");
+  Serial.print(nilai);
+  Serial.print(" Volt: ");
+  Serial.print(volt);
+  Serial.print(" V Persen: ");
+  Serial.print(persen);
+  Serial.println("%");
+
+  // Menampilkan data ke LCD baris pertama
+  lcd.setCursor(0, 0);          // Set posisi kolom 0, baris 0
+  lcd.print("ADC:");
+  lcd.print(nilai);             
+  lcd.print("   ");             // Menghapus sisa karakter lama
+
+  // Membuat progress bar di baris kedua
+  lcd.setCursor(0, 1);          // Pindah ke baris kedua
+  int panjangBar = map(nilai, 0, 1023, 0, 16); // Mapping ke panjang bar
+
+  for (int i = 0; i < 16; i++) { // Loop sepanjang 16 kolom LCD
+    if (i < panjangBar) {
+      lcd.print((char)255);     // Karakter blok penuh
+    } else {
+      lcd.print(" ");           // Kosong
+    }
+  }
+
+  delay(200);                   // Delay agar tampilan stabil
+}
+```
+## Dokumentasi
+
