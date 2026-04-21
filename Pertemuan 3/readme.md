@@ -108,4 +108,6 @@ void loop() {
 }
 ```
 ## Dokumentasi
+<img text-align="center" width="500" height="500" alt="WhatsApp Image 2026-04-21 at 20 51 13" src="https://github.com/user-attachments/assets/a2cba91d-c364-40c5-95b6-1f87fce525cb" />
+<img width="500" height="500" alt="WhatsApp Image 2026-04-21 at 20 51 13 (1)" src="https://github.com/user-attachments/assets/cc446986-7e0f-41f3-8350-8bdd66387f5b" />
 
